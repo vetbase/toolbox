@@ -1,0 +1,41 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+HOME_DIR = "."
+WORK_DIR = "/Users/larkmullins/Development/vetbase/oksana-cli"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |vagrant|
+    vagrant.vm.box = "ubuntu/wily64"
+
+    # set IP address
+    vagrant.vm.network "private_network", ip: "192.168.2.14"
+
+    # always use vagrant's insecure key
+    vagrant.ssh.insert_key = false
+
+    # speed up docker builds
+    vagrant.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--nictype1", "virtio"]
+    end
+
+    vagrant.vm.provision "shell", inline: "sudo apt-get upgrade -y python && \
+                                           sudo apt-get install -y python-pip python-dev openssl libssl-dev && \
+                                           sudo apt-get install -y software-properties-common && \
+                                           sudo apt-add-repository -y ppa:ansible/ansible && \
+                                           sudo apt-get update -y && \
+                                           sudo apt-get install -y ansible"
+
+    vagrant.vm.provision "ansible_local" do |ansible|
+        ansible.playbook = "playbook.yml"
+        ansible.install  = true
+    end
+
+    # sync working vagrant folder
+    vagrant.vm.synced_folder HOME_DIR, "/home/vagrant", create: true
+
+    # sync src folder
+    vagrant.vm.synced_folder WORK_DIR, "/development", create: true
+end

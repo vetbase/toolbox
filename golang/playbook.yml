@@ -1,0 +1,11 @@
+---
+- hosts: all
+  become: true
+  vars:
+    update_packages: True
+  tasks:
+    - name: Install Golang PPA
+      apt_repository: repo='ppa:ubuntu-lxc/lxd-stable' update_cache=yes
+
+    - name: Install Golang
+      apt: name=golang update_cache=yes
