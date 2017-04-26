@@ -5,7 +5,6 @@
 VAGRANTFILE_API_VERSION = "2"
 
 WORKSPACE = ENV['WORKSPACE'] || "."
-SOURCE    = ENV['SOURCE'] || "devel"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |vagrant|
     vagrant.vm.box = "vetbase/centos-7"
@@ -19,7 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |vagrant|
     # virtualbox specific settings
     vagrant.vm.provider "virtualbox" do |v|
         # custom name
-        v.name = "vetbase-toolbox-go"
+        v.name = "vetbase-toolbox-frontend"
     end
 
     vagrant.vm.provision "ansible" do |ansible|
@@ -27,5 +26,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |vagrant|
     end
 
     # sync src folder
-    vagrant.vm.synced_folder WORKSPACE, "/workspace/src/" + SOURCE, create: true
+    vagrant.vm.synced_folder WORKSPACE, "/development", create: true
 end

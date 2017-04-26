@@ -4,14 +4,14 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
-WORKSPACE = ENV['WORKSPACE'] || "."
-SOURCE    = ENV['SOURCE'] || "devel"
+SOURCE     = ENV['SOURCE'] || "."
+IP_ADDRESS = "192.168.11.54"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |vagrant|
     vagrant.vm.box = "vetbase/centos-7"
 
     # set IP address
-    vagrant.vm.network "private_network", ip: "192.168.32.14"
+    vagrant.vm.network "private_network", ip: IP_ADDRESS
 
     # always use vagrant's insecure key
     vagrant.ssh.insert_key = false
@@ -19,13 +19,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |vagrant|
     # virtualbox specific settings
     vagrant.vm.provider "virtualbox" do |v|
         # custom name
-        v.name = "vetbase-toolbox-go"
+        v.name = "vetbase-php-7.1.0"
     end
 
+    # run ansible provisioner
     vagrant.vm.provision "ansible" do |ansible|
         ansible.playbook = "playbook.yml"
     end
 
-    # sync src folder
-    vagrant.vm.synced_folder WORKSPACE, "/workspace/src/" + SOURCE, create: true
+    # sync source files
+    vagrant.vm.synced_folder SOURCE, "/development"
 end

@@ -1,6 +1,9 @@
 # Directories
 .vagrant
+golang2
+
 
 # Files
 .bash_history
 .DS_Store
+playbook.retry

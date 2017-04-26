@@ -1,0 +1,120 @@
+#!/bin/bash
+
+toolboxes=(
+    'golang::Toolbox for working with Go applications'
+)
+
+if ! type "vagrant" > /dev/null; then
+    echo "Vagrant (https://www.vagrantup.com/downloads.html) must be installed before building toolboxes"
+fi
+
+usage () {
+    echo "Usage: $0 run <toolbox>" 1>&2;
+    exit 1;
+}
+
+delete () {
+    echo "Deleting $1 toolbox"
+    cd $1 && vagrant destroy -f
+}
+
+up () {
+    echo "Running $1 toolbox"
+    cd $1 && vagrant up
+    echo "Logging into $1 toolbox"
+    vagrant ssh
+}
+
+reload() {
+    echo "Reloading $1 toolbox"
+    cd $1 && vagrant reload
+}
+
+ssh() {
+    echo "SSH into $1 toolbox"
+    cd $1 && vagrant ssh
+}
+
+if [ $# -eq 0 ]; then
+    usage
+fi
+
+if [ "$1" = "run" ]; then
+
+    if [ "$2" = "" ]; then
+        echo "ERROR: Run requires a toolbox name."
+        echo "SUB-COMMANDS:"
+        echo -e "list\tlist available boxes"
+    fi
+
+    if [ "$2" = "list" ]; then
+        echo "Available Toolboxes"
+        for index in "${toolboxes[@]}"; do
+            KEY="${index%%::*}"
+            VALUE="${index##*::}"
+            echo -e "$KEY\t\t$VALUE";
+        done
+    fi
+
+    for index in "${toolboxes[@]}"; do
+        KEY="${index%%::*}"
+        if [ "$2" = "$KEY" ]; then
+            up $2
+            break
+        fi
+    done
+fi
+
+if [ "$1" = "reload" ]; then
+
+    if [ "$2" = "" ]; then
+        echo "ERROR: Reload requires a toolbox name."
+        echo "SUB-COMMANDS:"
+        echo -e "list\tlist available boxes"
+    fi
+
+    for index in "${toolboxes[@]}"; do
+        KEY="${index%%::*}"
+        if [ "$2" = "$KEY" ]; then
+            reload $2
+            break
+        fi
+    done
+
+fi
+
+if [ "$1" = "ssh" ]; then
+
+    if [ "$2" = "" ]; then
+        echo "ERROR: SSH requires a toolbox name."
+        echo "SUB-COMMANDS:"
+        echo -e "list\tlist available boxes"
+    fi
+
+    for index in "${toolboxes[@]}"; do
+        KEY="${index%%::*}"
+        if [ "$2" = "$KEY" ]; then
+            ssh $2
+            break
+        fi
+    done
+
+fi
+
+if [ "$1" = "delete" ]; then
+
+    if [ "$2" = "" ]; then
+        echo "ERROR: Delete requires a toolbox name."
+        echo "SUB-COMMANDS:"
+        echo -e "list\tlist available boxes"
+    fi
+
+    for index in "${toolboxes[@]}"; do
+        KEY="${index%%::*}"
+        if [ "$2" = "$KEY" ]; then
+            delete $2
+            break
+        fi
+    done
+
+fi

@@ -1,0 +1,21 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Update CentOS
+      yum: name=* state=latest
+
+    - name: Add EPEL Repository
+      yum_repository:
+        name: epel
+        description: EPEL YUM repo
+        baseurl: http://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+
+    - name: Install NodeJS 0.10
+      yum: name=nodejs state=installed
+
+    - name: Install Ruby
+      yum: name=ruby state=installed
+
+    - name: Install Sass Gem
+      gem: name=sass state=present

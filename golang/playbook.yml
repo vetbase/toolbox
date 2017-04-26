@@ -1,11 +1,29 @@
 ---
 - hosts: all
   become: true
-  vars:
-    update_packages: True
   tasks:
-    - name: Install Golang PPA
-      apt_repository: repo='ppa:ubuntu-lxc/lxd-stable' update_cache=yes
+    - name: Update CentOS
+      yum: name=* state=latest
+
+    - name: Add EPEL Repository
+      yum_repository:
+        name: epel
+        description: EPEL YUM repo
+        baseurl: http://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+
+    - name: Install Git
+      yum: name=git state=latest
 
     - name: Install Golang
-      apt: name=golang update_cache=yes
+      yum: name=golang state=latest
+
+    - name: Copy bash_profile file
+      copy: src=bash_profile dest=/home/vagrant/.bash_profile owner=vagrant group=vagrant mode=0644
+
+    - name: Set vagrant owner
+      file: path=/workspace state=directory recurse=yes owner=vagrant group=vagrant
+
+    - name: Install govendor
+      command: go get -u github.com/kardianos/govendor
+      environment:
+        GOPATH: /workspace
